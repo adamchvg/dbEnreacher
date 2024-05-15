@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Enreacher</title>
+    <link rel="stylesheet" href="style.css">
+    <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
+</head>
+<body>
+  <div class="kupaneg close">
+    <ul class="upegedsa">
+      <li>
+        <a href="https://docs.google.com/spreadsheets/d/1zZgl2Jib7nW5G3ob7QnTSpER3hE4nCSdA48seHsDoNw/edit#gid=605444774">
+          <i class='bx bx-wrench' ></i>
+          <span class="link_name">Database</span>
+        </a>
+      </li>
+      <li>
+        <div class="iocn-link">
+          <a href="#">
+            <i class='bx bx-wifi' ></i>
+            <span class="link_name">Apis</span>
+          </a>
+          <i class='bx bxs-chevron-down arrow' ></i>
+        </div>
+        <ul class="kaned-sakopa">
+          <li>
+              <a href="#">Serper</a>
+              <form class="api-form" id="serper-form" action="/update-api-keys" method="post">
+                  <input class="api-input" type="text" placeholder="api-key" name="api-key">
+                  <button type="submit">Save</button>
+              </form>
+          </li>
+          <li>
+              <a href="#">Gemini</a>
+              <form class="api-form" id="gemini-form" action="/update-api-keys" method="post">
+                  <input class="api-input" type="text" placeholder="api-key" name="api-key">
+                  <button type="submit">Save</button>
+              </form>
+          </li>
+          <li>
+              <a href="#">OpenAI</a>
+              <form class="api-form" id="openai-form" action="/update-api-keys" method="post">
+                  <input class="api-input" type="text" placeholder="api-key" name="api-key">
+                  <button type="submit">Save</button>
+              </form>
+          </li>
+          <li>
+            <a href="#">Webhook</a>
+            <form class="api-form" id="webhook-form" action="/update-api-keys" method="post">
+                <input class="api-input" type="text" placeholder="Webhook URL" name="api-key">
+                <button type="submit">Save</button>
+            </form>
+        </li>
+        <li>
+            <a href="#">Spreadsheet ID</a>
+            <form class="api-form" id="spreadsheetID-form" action="/update-api-keys" method="post">
+                <input class="api-input" type="text" placeholder="Spreadsheet ID" name="api-key">
+                <button type="submit">Save</button>
+            </form>
+        </li>
+      </ul>
+      
+      
+      </li>
+      <li>
+        <a href="#">
+          <i class='bx bx-cog' ></i>
+          <span class="link_name">Settings</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+  <div class="start-button-loading-identificator">
+    <span class="submit-spinner submit-spinner_hide"></span>
+  </div>
+  <div class="start-processing-button">
+    <div class="start-button-wrapper">
+      <div class="start-button">
+        <i class="play-icon"><img src="./icons/Play.png" alt="play-icon"></i>
+      </div>
+      
+    </div>
+
+      <div class="start-processing-button-description">
+          <p>Start</p>
+          <p>Processing data</p>
+      </div>
+    </div>
+  </div>
+  <button class="stop" type="submit">Stop</button>
+  <span class="loader"></span>
+  <footer>
+    <button class="chatbot-prompt-helper" onclick="toggleChatbotWindow()">Make prompt</button>
+
+    <div class="chatbot-window" id="chatbotWindow">
+        <div class="chatbot-window-header">
+            <div class="chatbot-window-title">AI Assistant</div>
+            <button class="close-window-button" onclick="toggleChatbotWindow()"><img src="./icons/closeIcon.png" alt="close"></button>
+        </div>
+       
+        <div class="chatbot-content">
+            <!-- Содержимое чат-бота будет здесь -->
+        </div>
+        <form class="chatbot-form" action="/bot" method="post">
+            <input class="chatbot-input" type="text" name="chat" placeholder="Start session">
+            <button class="chatbot-button" type="submit"><img src="icons/sendIcon.png" alt="Send"></button>
+        </form>
+    </div>
+  </footer>
+  <script src="http://code.jquery.com/jquery-latest.min.js"></script>
+
+  <script>
+    function toggleChatbotWindow() {
+        var chatbotWindow = document.getElementById('chatbotWindow');
+        if (chatbotWindow.style.display === 'block') {
+            chatbotWindow.style.display = 'none';
+        } else {
+            chatbotWindow.style.display = 'block';
+        }
+    }
+    </script>
+  <script>
+    // вертикальное меню
+    let arrow = document.querySelectorAll(".arrow");
+    for (let i = 0; i < arrow.length; i++) {
+        arrow[i].addEventListener("click", (e) => {
+            let arrowParent = e.target.parentElement.parentElement;
+            arrowParent.classList.toggle("showMenu");
+        });
+    }
+    let kupaneg = document.querySelector(".kupaneg");
+
+    kupaneg.addEventListener("mouseenter", () => {
+        kupaneg.classList.remove("close");
+    });
+
+    kupaneg.addEventListener("mouseleave", () => {
+        kupaneg.classList.add("close");
+    });
+
+    let loader = document.querySelector('.loader');
+    // форма
+    const ws = new WebSocket('ws://localhost:8080');
+
+    ws.onopen = function() {
+        console.log('WebSocket connection established');
+    };
+
+    ws.onerror = function(error) {
+        console.error('WebSocket error:', error);
+    };
+
+    ws.onmessage = function(event) {
+        var data = event.data;
+        console.log('Received message from server:', event.data);
+        try {
+            var jsonData = JSON.parse(event.data);
+            if(jsonData.action === "API keys updated successfully") {
+                alert("API key updated successfully");
+            }
+            if(jsonData.action === "running") {
+                loader.classList.add("loader1");
+            }
+            if(jsonData.action === "finish") {
+                alert("data procced");
+                loader.classList.remove("loader1");
+            }
+            if(jsonData.bot === true) {
+                displayMessage(jsonData.message, false);
+            }
+        } catch(e) {
+            console.error(e);
+        }
+        
+
+    };
+    
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        var chatbotForm = document.querySelector('.chatbot-form');
+
+        chatbotForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            var chatInput = document.querySelector('.chatbot-input');
+            var messageBot = chatInput.value.trim();
+
+            if (messageBot !== '') {
+                sendMessage('chatBot', null, null, null, null, null, messageBot); 
+                console.log(messageBot);
+                displayMessage(messageBot, true);
+            
+                chatInput.value = '';
+            }
+        });
+    });
+
+    // Функция для отправки сообщения на сервер
+    function sendMessage(action, serper, gemini, openai, webhook, spreadsheetID, bot) {
+        const message = JSON.stringify({ action, serper, gemini, openai, webhook, spreadsheetID, bot });
+        ws.send(message);
+    }
+
+
+    // Обработчик клика на кнопке "Start"
+    document.addEventListener('DOMContentLoaded', function() {
+        var startButton = document.querySelector('.start-button');
+
+        startButton.addEventListener('click', function() {
+            sendMessage('start');
+        });
+    });
+
+    // Обработчик клика на кнопке "Stop"
+    document.addEventListener('DOMContentLoaded', function() {
+        var stopButton = document.querySelector('.stop');
+
+        stopButton.addEventListener('click', function() {
+            sendMessage('stop');
+        });
+    });
+
+    // Обработчик отправки данных формы для Serper
+    document.addEventListener('DOMContentLoaded', function() {
+        var serperForm = document.getElementById('serper-form');
+
+        serperForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            var formData = new FormData(serperForm);
+            var serper = formData.get('api-key');
+
+            sendMessage('updateKeys', serper, null, null, null, null); 
+        });
+    });
+   
+    function displayMessage(message, isClientMessage) {
+        var chatbotContent = document.querySelector('.chatbot-content');
+        var messageElement = document.createElement('div');
+        var iconClass = isClientMessage ? 'client-icon' : 'server-icon';
+        
+        messageElement.className = isClientMessage ? 'message client-message' : 'message server-message';
+
+        try {
+            var parsedMessage = JSON.parse(message);
+            message = parsedMessage.message || message;
+        } catch (error) {
+            // Обработка ошибки при парсинге JSON
+        }
+
+        messageElement.textContent = message;
+
+        // Добавляем иконку в зависимости от типа сообщения
+        var iconElement = document.createElement('i');
+        iconElement.className = 'icon ' + iconClass;
+        messageElement.appendChild(iconElement);
+
+        // Генерация уникального идентификатора для сообщения
+        var messageId = 'message_' + Date.now(); // Используем метку времени
+        messageElement.classList.add(messageId);
+
+        // Добавляем время сообщения
+        var timeElement = document.createElement('div');
+        var currentTime = new Date();
+        var hours = currentTime.getHours();
+        var minutes = currentTime.getMinutes();
+        var seconds = currentTime.getSeconds();
+        var timeString = [hours, minutes].map(unit => unit < 10 ? '0' + unit : unit).join(':');
+        timeElement.textContent = timeString;
+        timeElement.className = 'message-time';
+        messageElement.appendChild(timeElement);
+
+        chatbotContent.appendChild(messageElement);
+        chatbotContent.scrollTop = chatbotContent.scrollHeight;
+    }
+
+
+
+
+
+
+
+
+    // Обработчик отправки данных формы для Gemini
+    document.addEventListener('DOMContentLoaded', function() {
+        var geminiForm = document.getElementById('gemini-form');
+
+        geminiForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            var formData = new FormData(geminiForm);
+            var gemini = formData.get('api-key');
+
+            sendMessage('updateKeys', null, gemini, null, null, null);
+        });
+    });
+
+    // Обработчик отправки данных формы для OpenAI
+    document.addEventListener('DOMContentLoaded', function() {
+        var openaiForm = document.getElementById('openai-form');
+
+        openaiForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            var formData = new FormData(openaiForm);
+            var openai = formData.get('api-key');
+
+            sendMessage('updateKeys', null, null, openai, null, null); 
+        });
+    });
+
+    // Обработчик отправки данных формы для Webhook
+    document.addEventListener('DOMContentLoaded', function() {
+        var webhookForm = document.getElementById('webhook-form');
+
+        webhookForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            var formData = new FormData(webhookForm);
+            var webhook = formData.get('api-key');
+
+            sendMessage('updateKeys', null, null, null, webhook, null); 
+        });
+    });
+
+    // Обработчик отправки данных формы для SpreadsheetID
+    document.addEventListener('DOMContentLoaded', function() {
+        var spreadsheetIDForm = document.getElementById('spreadsheetID-form');
+
+        spreadsheetIDForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            var formData = new FormData(spreadsheetIDForm);
+            var spreadsheetID = formData.get('api-key'); 
+
+            sendMessage('updateKeys', null, null, null, null, spreadsheetID); 
+        });
+    });
+
+
+
+
+</script>
+<script>
+
+</script>
+    
+    
+</body>
+</html>

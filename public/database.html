@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Front-end</title>
+</head>
+<body>
+    <div id="form-container">
+        <h2>Введите API ключи и ID Google Spreadsheet</h2>
+        <form id="config-form">
+            <label for="google-api-key">Google API ключ:</label>
+            <input type="text" id="google-api-key" required><br>
+            <label for="openai-api-key">OpenAI API ключ:</label>
+            <input type="text" id="openai-api-key" required><br>
+            <label for="gemini-api-key">Gemini API ключ:</label>
+            <input type="text" id="gemini-api-key" required><br>
+            <label for="spreadsheet-id">ID Google Spreadsheet:</label>
+            <input type="text" id="spreadsheet-id" required><br>
+            <button type="submit">Отправить</button>
+        </form>
+    </div>
+
+    <div id="result-container"></div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('config-form');
+            const resultContainer = document.getElementById('result-container');
+
+            form.addEventListener('submit', async (event) => {
+                event.preventDefault();
+
+                const googleApiKey = document.getElementById('google-api-key').value;
+                const openaiApiKey = document.getElementById('openai-api-key').value;
+                const geminiApiKey = document.getElementById('gemini-api-key').value;
+                const spreadsheetId = document.getElementById('spreadsheet-id').value;
+
+                try {
+                    // Отправить данные на сервер
+                    const response = await fetch('/api/config', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            googleApiKey,
+                            openaiApiKey,
+                            geminiApiKey,
+                            spreadsheetId
+                        })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Ошибка при отправке данных на сервер');
+                    }
+
+                    // Получить результат от сервера
+                    const result = await response.json();
+
+                    // Отобразить результат на странице
+                    resultContainer.innerHTML = `<pre>${JSON.stringify(result, null, 2)}</pre>`;
+                } catch (error) {
+                    console.error('Произошла ошибка:', error);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
