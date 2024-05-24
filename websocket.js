@@ -247,7 +247,7 @@ wss.on('connection', ws => {
 
 // Установка заголовков для CORS
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '/'); 
+  res.header('Access-Control-Allow-Origin', 'http://146.190.59.103'); 
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   if (req.method === 'OPTIONS') {
