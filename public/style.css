@@ -118,7 +118,7 @@ body {
 }
 .server-message {
   text-align: left;
-  justify-self: left;
+  align-self: left;
   width: fit-content;
   border-radius: 10px;
   margin-right: 10%;
