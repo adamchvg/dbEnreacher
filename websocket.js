@@ -12,9 +12,6 @@ const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 const io = socketIO(server);
 
-const fs = require('fs');
-require('dotenv').config();
-
 const envFilePath = '.env';
 
 const inMemoryConfig = {};
