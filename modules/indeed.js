@@ -8,7 +8,7 @@ const {createChatCompletion, counter} = require('./openai');
 const {runChat} = require('./gemini');
 const {getRandomNumber, removeDuplicates, sleep, sendFinishSignal} = require('./utilities');
 
-const google_sheet_ID = process.env.SPREADSHEET_ID;
+const google_sheet_ID = inMemoryConfig['SPREADSHEET_ID'];
 
 async function fetchAndProcessData() {
     const normalizedData = await normalizeData();

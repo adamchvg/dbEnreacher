@@ -59,6 +59,7 @@ body {
   padding: 10px;
   position: absolute; 
   z-index: 5;
+  display: flex;
 }
 .chatbot-form {
   margin: auto;
@@ -107,6 +108,7 @@ body {
   margin: 5px;
 }
 .client-message {
+  justify-self: right;
   width: fit-content;
   text-align: right;
   float: right;
@@ -116,9 +118,10 @@ body {
 }
 .server-message {
   text-align: left;
-  float: left !important;
+  align-self: left;
   width: fit-content;
   border-radius: 10px;
+  margin-right: 10%;
   max-width: 90%;
   background: linear-gradient(90deg, rgba(255,75,75,0.6811099439775911) 0%, rgba(255,0,0,0.1881127450980392) 100%);
 }
@@ -126,6 +129,7 @@ body {
   font-size: 12px;
   letter-spacing: normal;
   color: #2c2c2c;
+  text-align: right;
 }
 .client-icon {
   width: 10px;
