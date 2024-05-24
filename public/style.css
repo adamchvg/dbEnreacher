@@ -117,12 +117,12 @@ body {
   background: linear-gradient(90deg, rgba(75,148,255,0.6811099439775911) 0%, rgba(51,0,255,0.1881127450980392) 100%);
 }
 .server-message {
-  text-align: left;
-  align-self: left;
+  justify-self: left;
   width: fit-content;
+  text-align: left;
+  float: right;
   border-radius: 10px;
-  margin-right: 10%;
-  max-width: 90%;
+  max-width: calc(100%-20px);
   background: linear-gradient(90deg, rgba(255,75,75,0.6811099439775911) 0%, rgba(255,0,0,0.1881127450980392) 100%);
 }
 .message-time {

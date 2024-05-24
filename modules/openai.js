@@ -10,9 +10,9 @@ const openaiClient = new OpenAI({
 async function createChatCompletion(prompt) {
     try {
         const response = await openaiClient.chat.completions.create({
-            model: 'gpt-3.5-turbo', 
+            model: 'gpt-4', 
             messages: [
-                { role: 'system', content: 'You are a helpful assistant' },
+                { role: 'system', content: 'You are a helpful assistant that help me ro rank company with number' },
                 { role: 'user', content: prompt},
             ],
         });
