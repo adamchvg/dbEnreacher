@@ -12,11 +12,34 @@ const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 const io = socketIO(server);
 
+const fs = require('fs');
+require('dotenv').config();
+
+const envFilePath = '.env';
+
+const inMemoryConfig = {};
+
+// Загрузка начальной конфигурации из файла .env
+function loadConfig() {
+  const envContent = fs.readFileSync(envFilePath, 'utf8');
+  const lines = envContent.split('\n');
+  lines.forEach(line => {
+    const [key, value] = line.split('=');
+    if (key && value) {
+      inMemoryConfig[key.trim()] = value.trim();
+    }
+  });
+}
+
+// Загрузка начальной конфигурации
+loadConfig();
+
+
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 app.use(express.json());
 
-const envFilePath = '.env';
+
 
 // Генерация секретного ключа для сессии
 const sessionSecret = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
@@ -85,27 +108,23 @@ app.post('/script-control', async (req, res) => {
     const data = req.body;
     const action = data.action;
     const spreadsheetID = data.spreadsheet_id;
-    const makeReq = req.body;
-    console.log(makeReq);
     if (action === "start") {
       try {
-        res.status(200).send("script rusnning successfully");
+        res.status(200).send("script running successfully");
         await updateEnvFile({SPREADSHEET_ID: spreadsheetID});
         await fetchAndProcessData();
       } catch(error) {
-        console.error("An error occurred: ", error);
+        console.error("Произошла ошибка: ", error);
       }
-  
-    }
-    
-    else {
+    } else {
       res.status(400).send("Invalid action");
     }
   } catch (error) {
-    console.error("An error occurred:", error);
+    console.error("Произошла ошибка:", error);
     res.status(500).send("Internal server error");
   }
 });
+
 app.post('/bot', (req, res) => {
   res.render('main');
 })
@@ -120,6 +139,7 @@ function updateEnvFile(data) {
     Object.keys(data).forEach(key => {
       if (data[key] !== null) {
         newData[key.toUpperCase()] = data[key];
+        inMemoryConfig[key.toUpperCase()] = data[key]; // Обновление конфигурации в памяти
       }
     });
 
@@ -138,9 +158,10 @@ function updateEnvFile(data) {
 
     fs.writeFileSync(envFilePath, lines.join('\n'), { flag: 'w' });
   } catch (error) {
-    console.error('Error updating .env file:', error);
+    console.error('Ошибка при обновлении .env файла:', error);
   }
 }
+
 
 // Функция для проверки наличия пользователя в базе данных
 function checkUser(email, password) {
