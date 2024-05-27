@@ -7,6 +7,7 @@ const {readFromSheet, writeToSheet, clearSheet, updateSheetWithUniqueData, norma
 const {createChatCompletion, counter} = require('./openai');
 const {runChat} = require('./gemini');
 const {getRandomNumber, removeDuplicates, sleep, sendFinishSignal} = require('./utilities');
+const { inMemoryConfig, updateEnvFile } = require('./config');
 
 const google_sheet_ID = inMemoryConfig['SPREADSHEET_ID'];
 

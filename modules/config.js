@@ -1,34 +1,23 @@
-// config.js
 const fs = require('fs');
 require('dotenv').config();
 
 const envFilePath = '.env';
 
-const config = {};
+const inMemoryConfig = {};
 
-// Загрузка начальной конфигурации из файла .env
+// Load initial configuration from .env file
 function loadConfig() {
   const envContent = fs.readFileSync(envFilePath, 'utf8');
   const lines = envContent.split('\n');
   lines.forEach(line => {
     const [key, value] = line.split('=');
     if (key && value) {
-      config[key.trim()] = value.trim();
+      inMemoryConfig[key.trim()] = value.trim();
     }
   });
 }
 
-// Загрузка начальной конфигурации
-loadConfig();
-
-function getConfig(key) {
-  return config[key];
-}
-
-function setConfig(key, value) {
-  config[key] = value;
-}
-
+// Update .env file with new configuration
 function updateEnvFile(data) {
   try {
     let envContent = fs.readFileSync(envFilePath, 'utf8');
@@ -39,7 +28,7 @@ function updateEnvFile(data) {
     Object.keys(data).forEach(key => {
       if (data[key] !== null) {
         newData[key.toUpperCase()] = data[key];
-        setConfig(key.toUpperCase(), data[key]); // Обновление конфигурации в памяти
+        inMemoryConfig[key.toUpperCase()] = data[key]; // Update in-memory configuration
       }
     });
 
@@ -58,12 +47,15 @@ function updateEnvFile(data) {
 
     fs.writeFileSync(envFilePath, lines.join('\n'), { flag: 'w' });
   } catch (error) {
-    console.error('Ошибка при обновлении .env файла:', error);
+    console.error('Error updating .env file:', error);
   }
 }
 
+// Initialize the configuration on module load
+loadConfig();
+
 module.exports = {
-  getConfig,
-  setConfig,
+  inMemoryConfig,
+  loadConfig,
   updateEnvFile
 };
