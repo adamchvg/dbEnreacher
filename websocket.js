@@ -1,8 +1,7 @@
 const express = require('express');
 const session = require('express-session');
 const {fetchAndProcessData, sendFinishSignal} = require('./modules/indeed');
-const {createChatCompletion} = require('./modules/utilities');
-const { getConfig, updateEnvFile } = require('./modules/config');
+const {createChatCompletion} = require('./modules/utilities')
 const http = require('http');
 const WebSocket = require('ws');
 const fs = require('fs');
@@ -12,9 +11,6 @@ const app = express();
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 const io = socketIO(server);
-
-const fs = require('fs');
-require('dotenv').config();
 
 const envFilePath = '.env';
 
@@ -130,6 +126,38 @@ app.post('/bot', (req, res) => {
   res.render('main');
 })
 
+function updateEnvFile(data) {
+  try {
+    let envContent = fs.readFileSync(envFilePath, 'utf8');
+
+    let lines = envContent.split('\n');
+    let newData = {};
+
+    Object.keys(data).forEach(key => {
+      if (data[key] !== null) {
+        newData[key.toUpperCase()] = data[key];
+        inMemoryConfig[key.toUpperCase()] = data[key]; // Обновление конфигурации в памяти
+      }
+    });
+
+    lines = lines.map(line => {
+      let [key, value] = line.split('=');
+      key = key.trim().toUpperCase();
+      if (newData.hasOwnProperty(key)) {
+        if (newData[key] !== null) {
+          return `${key}=${newData[key]}`;
+        } else {
+          return line;
+        }
+      }
+      return line;
+    });
+
+    fs.writeFileSync(envFilePath, lines.join('\n'), { flag: 'w' });
+  } catch (error) {
+    console.error('Ошибка при обновлении .env файла:', error);
+  }
+}
 
 
 // Функция для проверки наличия пользователя в базе данных
@@ -215,11 +243,11 @@ wss.on('connection', ws => {
         ws.send(JSON.stringify({ action: 'running' }));
         process.exit();
       }
-      if (action === 'updateKeys') {
-        console.log({ SERPER_API: serper, GEMINI_API: gemini, OPENAI_API: openai, WEBHOOK: webhook, SPREADSHEET_ID: spreadsheetID });
-        updateEnvFile({ SERPER_API: serper, GEMINI_API: gemini, OPENAI_API: openai, WEBHOOK: webhook, SPREADSHEET_ID: spreadsheetID });
+       else if (action === 'updateKeys') {
+        console.log({ SERPER_API: serper, GEMINI_API: gemini, OPENAI_API: openai, WEBHOOK: webhook, SPREADSHEET_ID: spreadsheetID});
+        updateEnvFile({ SERPER_API: serper, GEMINI_API: gemini, OPENAI_API: openai, WEBHOOK: webhook, SPREADSHEET_ID: spreadsheetID});
         ws.send(JSON.stringify({ action: 'API keys updated successfully' }));
-      } else {ы
+      } else {
         
       }
     } catch (error) {

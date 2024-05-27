@@ -12,7 +12,7 @@ async function createChatCompletion(prompt) {
         const response = await openaiClient.chat.completions.create({
             model: 'gpt-3.5-turbo', 
             messages: [
-                { role: 'system', content: 'You are a helpful assistant' },
+                { role: 'system', content: 'You are a helpful assistant that help me ro rank company with number' },
                 { role: 'user', content: prompt},
             ],
         });
